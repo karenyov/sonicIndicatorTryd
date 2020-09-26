@@ -1,5 +1,24 @@
+/**
+* Sonic Faster Indicator - TRYD
+* data: 25/09/2020
+*
+* @author: Karen Vicente
+*/
 
-def hiloLine = HILO(3); //Object HiLo
+// Config
+final BAR_VAR = 200;
+
+// HILO
+final HILO_PERIOD = 3;
+
+// RSI
+final RSI_PERIOD = 14;
+final RSI_BUY = 30;
+final RSI_SELL = 70;
+
+// ##############################################
+
+def hiloLine = HILO(HILO_PERIOD); //Object HiLo
 def bars = BARS(); //Object Candles
 
 r = newLines();
@@ -8,7 +27,7 @@ r.add(bars); //add bars on graphic
 def hiloSize = hiloLine.size(); // size HiLo (lines size)
 def barsSize = bars.size(); //size candles
 
-def rsiLine = RSI(14, 9); //Object RSI
+def rsiLine = RSI(RSI_PERIOD, 9); //Object RSI
 def rsiSize = rsiLine.size(); // size RSI (lines size)
 
 def firstLineG = 0, firstLineR = 0, resultRSI = 0; //first signal candle
@@ -24,12 +43,14 @@ for (int i = 1; i < barsSize; i++ ) {
 	def columnRSI = (diffColumnRSI > 0)? (i - diffColumnRSI) : i;
 	resultRSI = rsiLine.value(columnRSI); // Sobrecompra: >= 65, Sobrevenda: <= 35
 	
-	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < 60) { // GREEN COLOR
+	def barV = bars.bar(i).getHigh() - bars.bar(i).getLow();
+	
+	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < RSI_SELL && barV < BAR_VAR) { // GREEN COLOR
 		bars.bar(i).setFill(0, 255, 0);
 		bars.bar(i).setBorder(0, 255, 0);
 		firstLineG = 1;
 		firstLineR = 0;
-	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > 30) { // RED COLOR
+	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > RSI_BUY && barV < BAR_VAR) { // RED COLOR
 		bars.bar(i).setFill(255, 0, 0);
 		bars.bar(i).setBorder(255, 0, 0);
 		firstLineR = 1;
@@ -40,5 +61,5 @@ for (int i = 1; i < barsSize; i++ ) {
 	}	
 }
 
-//hiloLine.setLabel('SOMA=' + resultRSI);
+//hiloLine.setLabel('label=' + bars.bar(barsSize - 1).getVolume());
 //r.add(hiloLine);
