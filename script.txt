@@ -1,0 +1,46 @@
+
+def hiloLine = HILO(3); //Object HiLo
+def bars = BARS(); //Object Candles
+
+//add bars on graphic
+r = newLines();
+r.add(bars);
+
+def itensHilo = hiloLine.size(); // size HiLo (lines size)
+def itens = bars.size(); //size candles
+
+//first signal candle
+def firstLineG = 0;
+def firstLineR = 0;
+for (int i = 1; i < itens; i++ ) {
+
+	def volClose = bars.bar(i).getClose(); //current vol value
+	def diffColumn = itens - itensHilo; //size bars are bigger than size candles
+	
+	def columnHilo = (diffColumn > 0)? (i - diffColumn) : i;
+	def valorHilo = hiloLine.value(columnHilo);
+	if (volClose > valorHilo && firstLineG == 0) {	
+		//GREEN
+		bars.bar(i).setFill(0, 255, 0);
+		bars.bar(i).setBorder(0, 255, 0);
+		firstLineG = 1;
+		firstLineR = 0;
+	} else if (volClose <= valorHilo && firstLineR == 0) {
+		//RED
+		bars.bar(i).setFill(255, 0, 0);
+		bars.bar(i).setBorder(255, 0, 0);
+		firstLineR = 1;
+		firstLineG = 0;
+	} else {
+		//WHITE
+		bars.bar(i).setFill(255, 255, 255);
+		bars.bar(i).setBorder(255, 255, 255);
+	}	
+}
+
+def linhaRSI = RSI(14, 9); //Object RSI
+def resultRSI = 0;
+resultRSI = linhaRSI.value(linhaRSI.size() -1);
+
+hiloLine.setLabel('SOMA=' + resultRSI);
+r.add(hiloLine);
