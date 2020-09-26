@@ -6,7 +6,7 @@ Indicator Tryd
 - Type Graph: Candle
 
 ## Requirements
-- [Tryd](https://www.tryd.com.br/)
+- [Tryd PRO](https://www.tryd.com.br/)
 
 ## Get Started
 
