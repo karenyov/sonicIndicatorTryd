@@ -13,4 +13,5 @@ Indicator Tryd
 To go:
 > Gráficos -> Scripts de Indicadores -> Add new Script
 
-***GOOD LUCK :moneybag:
+
+***GOOD LUCK :moneybag:***
