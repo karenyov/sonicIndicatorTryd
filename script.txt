@@ -41,7 +41,7 @@ for (int i = 1; i < barsSize; i++ ) {
 	
 	def diffColumnRSI = barsSize - rsiSize; //size bars are bigger than size candles
 	def columnRSI = (diffColumnRSI > 0)? (i - diffColumnRSI) : i;
-	resultRSI = rsiLine.value(columnRSI); // Sobrecompra: >= 65, Sobrevenda: <= 35
+	resultRSI = rsiLine.value(columnRSI);
 	
 	def barV = bars.bar(i).getHigh() - bars.bar(i).getLow();
 	
