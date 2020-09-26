@@ -1,0 +1,2 @@
+# sonicIndicatorTryd
+Indicator Tryd
