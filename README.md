@@ -11,4 +11,6 @@ Indicator Tryd
 ## Get Started
 
 To go:
-> Gráficos -> Scripts de Indicadores
+> Gráficos -> Scripts de Indicadores -> Add new Script
+
+*GOOD LUCK :moneybag:
