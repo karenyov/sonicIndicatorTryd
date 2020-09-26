@@ -24,12 +24,12 @@ for (int i = 1; i < barsSize; i++ ) {
 	def columnRSI = (diffColumnRSI > 0)? (i - diffColumnRSI) : i;
 	resultRSI = rsiLine.value(columnRSI); // Sobrecompra: >= 65, Sobrevenda: <= 35
 	
-	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < 65) { // GREEN COLOR
+	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < 60) { // GREEN COLOR
 		bars.bar(i).setFill(0, 255, 0);
 		bars.bar(i).setBorder(0, 255, 0);
 		firstLineG = 1;
 		firstLineR = 0;
-	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > 35) { // RED COLOR
+	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > 30) { // RED COLOR
 		bars.bar(i).setFill(255, 0, 0);
 		bars.bar(i).setBorder(255, 0, 0);
 		firstLineR = 1;
@@ -42,5 +42,3 @@ for (int i = 1; i < barsSize; i++ ) {
 
 //hiloLine.setLabel('SOMA=' + resultRSI);
 //r.add(hiloLine);
-
-
