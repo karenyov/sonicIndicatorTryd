@@ -2,45 +2,45 @@
 def hiloLine = HILO(3); //Object HiLo
 def bars = BARS(); //Object Candles
 
-//add bars on graphic
 r = newLines();
-r.add(bars);
+r.add(bars); //add bars on graphic
 
-def itensHilo = hiloLine.size(); // size HiLo (lines size)
-def itens = bars.size(); //size candles
+def hiloSize = hiloLine.size(); // size HiLo (lines size)
+def barsSize = bars.size(); //size candles
 
-//first signal candle
-def firstLineG = 0;
-def firstLineR = 0;
-for (int i = 1; i < itens; i++ ) {
+def rsiLine = RSI(14, 9); //Object RSI
+def rsiSize = rsiLine.size(); // size RSI (lines size)
+
+def firstLineG = 0, firstLineR = 0, resultRSI = 0; //first signal candle
+for (int i = 1; i < barsSize; i++ ) {
 
 	def volClose = bars.bar(i).getClose(); //current vol value
-	def diffColumn = itens - itensHilo; //size bars are bigger than size candles
+	def diffColumnHilo = barsSize - hiloSize; //size bars are bigger than size candles
 	
-	def columnHilo = (diffColumn > 0)? (i - diffColumn) : i;
+	def columnHilo = (diffColumnHilo > 0)? (i - diffColumnHilo) : i;
 	def valorHilo = hiloLine.value(columnHilo);
-	if (volClose > valorHilo && firstLineG == 0) {	
-		//GREEN
+	
+	def diffColumnRSI = barsSize - rsiSize; //size bars are bigger than size candles
+	def columnRSI = (diffColumnRSI > 0)? (i - diffColumnRSI) : i;
+	resultRSI = rsiLine.value(columnRSI); // Sobrecompra: >= 65, Sobrevenda: <= 35
+	
+	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < 65) { // GREEN COLOR
 		bars.bar(i).setFill(0, 255, 0);
 		bars.bar(i).setBorder(0, 255, 0);
 		firstLineG = 1;
 		firstLineR = 0;
-	} else if (volClose <= valorHilo && firstLineR == 0) {
-		//RED
+	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > 35) { // RED COLOR
 		bars.bar(i).setFill(255, 0, 0);
 		bars.bar(i).setBorder(255, 0, 0);
 		firstLineR = 1;
 		firstLineG = 0;
-	} else {
-		//WHITE
+	} else { // WHITE COLOR
 		bars.bar(i).setFill(255, 255, 255);
 		bars.bar(i).setBorder(255, 255, 255);
 	}	
 }
 
-def linhaRSI = RSI(14, 9); //Object RSI
-def resultRSI = 0;
-resultRSI = linhaRSI.value(linhaRSI.size() -1);
+//hiloLine.setLabel('SOMA=' + resultRSI);
+//r.add(hiloLine);
 
-hiloLine.setLabel('SOMA=' + resultRSI);
-r.add(hiloLine);
+
