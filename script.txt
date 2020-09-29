@@ -18,48 +18,87 @@ final RSI_SELL = 70;
 
 // ##############################################
 
-def hiloLine = HILO(HILO_PERIOD); //Object HiLo
-def bars = BARS(); //Object Candles
+def hiloLine = HILO(HILO_PERIOD); // Object HiLo
+def bars = BARS(); // Object Candles
+
+def macdOSC = MACD_osc(close(), 12, 26, 0, 9);
+def macdSignal = MACD_signal(close(), 12, 26, 0, 9);
+def macdMain = MACD_main(close(), 12, 26, 0, 9);
 
 r = newLines();
-r.add(bars); //add bars on graphic
+r.add(bars); // add bars on graphic
 
 def hiloSize = hiloLine.size(); // size HiLo (lines size)
-def barsSize = bars.size(); //size candles
+def barsSize = bars.size(); // size candles
 
-def rsiLine = RSI(RSI_PERIOD, 9); //Object RSI
+def macdOscSize = macdOSC.size(); // size MACD OSC
+def macdSignalSize = macdSignal.size(); // size MACD SIGNAL
+def macdMainSize = macdMain.size(); // size MACD MAIN
+
+def rsiLine = RSI(RSI_PERIOD, 9); // Object RSI
 def rsiSize = rsiLine.size(); // size RSI (lines size)
 
-def firstLineG = 0, firstLineR = 0, resultRSI = 0; //first signal candle
+def firstLineG = 0, firstLineR = 0;
+def resultMACDSignal = 0, resultRSI = 0, resultMACDosc = 0, resultMACDMain = 0; // first signal candle
 for (int i = 1; i < barsSize; i++ ) {
 
-	def volClose = bars.bar(i).getClose(); //current vol value
-	def diffColumnHilo = barsSize - hiloSize; //size bars are bigger than size candles
+	def volClose = bars.bar(i).getClose(); // current vol value
+	def diffColumnHilo = barsSize - hiloSize; // size bars are bigger than size candles
 	
 	def columnHilo = (diffColumnHilo > 0)? (i - diffColumnHilo) : i;
 	def valorHilo = hiloLine.value(columnHilo);
 	
-	def diffColumnRSI = barsSize - rsiSize; //size bars are bigger than size candles
+	def diffColumnRSI = barsSize - rsiSize; // size bars are bigger than size candles
 	def columnRSI = (diffColumnRSI > 0)? (i - diffColumnRSI) : i;
 	resultRSI = rsiLine.value(columnRSI);
 	
+	def diffColumnMACDosc = barsSize - macdOscSize; // size bars are bigger than size MACD OSC
+	def columnMACDosc = (diffColumnMACDosc > 0)? (i - diffColumnMACDosc) : i;
+	resultMACDosc = macdOSC.value(columnMACDosc);
+	
+	def diffColumnMACDSignal = barsSize - macdSignalSize; // size bars are bigger than size MACD SIGNAL
+	def columnMACDSignal = (diffColumnMACDSignal > 0)? (i - diffColumnMACDSignal) : i;
+	resultMACDSignal = macdSignal.value(columnMACDSignal);
+	
+	def diffColumnMACDMain = barsSize - macdMainSize; // size bars are bigger than size MACD MAIN
+	def columnMACDMain = (diffColumnMACDMain > 0)? (i - diffColumnMACDMain) : i;
+	resultMACDMain = macdMain.value(columnMACDMain);
+	
 	def barV = bars.bar(i).getHigh() - bars.bar(i).getLow();
 	
-	if (volClose >= valorHilo && firstLineG == 0 && resultRSI < RSI_SELL && barV < BAR_VAR) { // GREEN COLOR
-		bars.bar(i).setFill(0, 255, 0);
-		bars.bar(i).setBorder(0, 255, 0);
-		firstLineG = 1;
-		firstLineR = 0;
-	} else if (volClose < valorHilo && firstLineR == 0 && resultRSI > RSI_BUY && barV < BAR_VAR) { // RED COLOR
-		bars.bar(i).setFill(255, 0, 0);
-		bars.bar(i).setBorder(255, 0, 0);
-		firstLineR = 1;
-		firstLineG = 0;
+	if (barV < BAR_VAR) {
+		if (volClose >= valorHilo) {
+			firstLineG += 1;
+			firstLineR = 0;
+		} else {
+			firstLineG = 0;
+			firstLineR += 1;
+		}	
+		
+		if (volClose >= valorHilo && firstLineG == 1 && resultRSI < RSI_SELL 
+			&& ( (resultMACDMain >= resultMACDSignal) || (resultMACDosc <= 100 && resultMACDosc >= -100) )
+		) { // GREEN COLOR
+			bars.bar(i).setFill(0, 255, 0);
+			bars.bar(i).setBorder(0, 255, 0);
+			firstLineG = 1;
+			firstLineR = 0;
+		} else if (volClose < valorHilo && firstLineR == 1 && resultRSI > RSI_BUY 
+			&& ( (resultMACDMain < resultMACDSignal) || (resultMACDosc <= 100 && resultMACDosc >= -100) )
+		) { // RED COLOR
+			bars.bar(i).setFill(255, 0, 0);
+			bars.bar(i).setBorder(255, 0, 0);
+			firstLineR = 1;
+			firstLineG = 0;
+		} else { // WHITE COLOR
+			bars.bar(i).setFill(255, 255, 255);
+			bars.bar(i).setBorder(255, 255, 255);
+		}
 	} else { // WHITE COLOR
 		bars.bar(i).setFill(255, 255, 255);
 		bars.bar(i).setBorder(255, 255, 255);
-	}	
+	}
+		
 }
 
-//hiloLine.setLabel('label=' + bars.bar(barsSize - 1).getVolume());
-//r.add(hiloLine);
+//macdOSC.setLabel('label=' + resultMACDosc);
+//r.add(macdSignal);
